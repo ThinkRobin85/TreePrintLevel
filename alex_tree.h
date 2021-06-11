@@ -3,8 +3,21 @@
 #include "tree.h"
 #include <limits.h>
 
+/** @brief struttura per semplificare la scrittura di alberi con molti livelli e molte foglie nel penultimo livello o precedenti. */
+typedef struct Elem_List
+{
+	size_t times; /* Numero di volte che è presente consecutivamente "e". */
+	const ElemType e; /* ElemType col valore ripetuto times volte nel vettore di ElemType per livelli. */
+} Elem_List;
+
 /** @brief NV viene usato per gli Elemtype di tipo "int" con valore 'INT_MAX' per definire i valori NULL nel vettore scritto per livelli per costruire un albero. */
 #define NV INT_MAX
+
+/** @brief Macro definita per indicare un elemento di tipo ElemType con valore x all'interno di un vettore di Elem_List. */
+#define E(x) ((Elem_List){1,x})
+
+/** @brief Macro definita per indicare x elementi di tipo ElemType con valore NV all'interno di un vettore di Elem_List. */
+#define N(x) ((Elem_List){x,NV})
 
 /** @brief TAB_SIZE viene usato per gli spazi usati per una tabulazione nella stampa di un albero per livelli. */
 #define TAB_SIZE 3
@@ -13,16 +26,16 @@
 #define NV_PRINT 'X'
 
 /** @brief FRECCIA_SX viene usato come carattere stampato per rappresentare una freccia sinistra nella stampa di un albero per livelli. */
-#define FRECCIA_SX (char)-55 //(char)-38
+#define FRECCIA_SX (char)-38 //(char)-55 | (char)31
 
 /** @brief FRECCIA_DX viene usato come carattere stampato per rappresentare una freccia destra nella stampa di un albero per livelli. */
-#define FRECCIA_DX (char)-69 //(char)-65
+#define FRECCIA_DX (char)-65 //(char)-69 | (char)31
 
 /** @brief PLUS viene usato come carattere stampato per rappresentare il link coi figli nella stampa di un albero per livelli. */
-#define PLUS (char)-54 //(char)-63
+#define PLUS (char)-63 //(char)-54 | '+'
 
 /** @brief LINE viene usato come carattere stampato per rappresentare la linea di collegamento coi figli nella stampa di un albero per livelli. */
-#define LINE (char)-51 //(char)-60
+#define LINE (char)-60 //(char)-51 | '-'
 
 /**
 @brief La funzione ritorna l'altezza dell'albero "n".
@@ -115,3 +128,20 @@ static void PrintfInString(char* str, const ElemType* e);
 @return Vettore di dimensione altezza dell'albero "n" + 1 contenente vettori di dimensione '2 alla level' contenente i puntatori a ElemType, possono essere NULL.
 */
 static const ElemType*** TreeGetLevelVectors(Node* n);
+
+/**
+@brief La funzione viene utilizzata per costruire un vettore di ElemType costituito dagli elementi disposti per livelli dell'albero desiderato partendo da un vettore di Elem_List.
+@param[in] v: Vettore di Elem_List di partenza.
+@param[in] n: Dimensione del vettore "v".
+@param[out] ris_dim: Puntatore a size_t dove verrà inserita la dimensione del vettore ritornato dalla funzione.
+@return Vettore di ElemType contentente gli elementi di un albero disposti per livello, può essere NULL.
+*/
+ElemType* ElemVectorFromStructVector(const Elem_List* v, size_t n, size_t* ris_dim);
+
+/**
+@brief La funzione viene utilizzata per stampare un albero partendo da un vettore di Elem_List e la sua dimensione.
+@param[in] el: Vettore di Elem_List di partenza.
+@param[in] n: Dimensione del vettore "el".
+@return Nessun valore di ritorno.
+*/
+extern void stampa(const Elem_List* el, size_t n);

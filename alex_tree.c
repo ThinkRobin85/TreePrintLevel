@@ -1,6 +1,7 @@
 #include "alex_tree.h"
 #include <stdlib.h>
 #include <string.h>
+#include <crtdbg.h>
 static void TreeGetHeightRec(Node* n, size_t curr_lvl, size_t* level)
 {
 	if (n == NULL) { return; }
@@ -53,14 +54,9 @@ Node* TreeFromLevelVector(const ElemType* v, size_t v_size)
 
 static void TreeGetLevelValuesRec(const Node* n, const ElemType** ris, size_t level, size_t curr_lvl, size_t* index)
 {
-	if (n == NULL)
+	if (n == NULL || curr_lvl == level)
 	{
-		*index += (size_t)(1 << (level - curr_lvl));
-		return;
-	}
-	if (curr_lvl == level)
-	{
-		ris[*index] = &(n->value);
+		if (curr_lvl == level) { ris[*index] = &(n->value); }
 		*index += (size_t)(1 << (level - curr_lvl));
 		return;
 	}
@@ -122,7 +118,7 @@ void TreePrintLevel(Node* n)
 		{
 			if (succ[j] != ' ' && j < strlen(succ))
 			{
-				curr[j] = (((count++)%2)==0)? FRECCIA_SX : FRECCIA_DX;
+				curr[j] = (((count++) % 2) == 0) ? FRECCIA_SX : FRECCIA_DX;
 				j += TAB_SIZE - 1;
 			}
 		}
@@ -141,4 +137,40 @@ void TreePrintLevel(Node* n)
 	for (size_t i = 0; i < n_level + 1; i++) { free((ElemType**)ris[i]); }
 	free(str);
 	free((ElemType***)ris);
+}
+
+ElemType* ElemVectorFromStructVector(const Elem_List* v, size_t n, size_t* ris_dim)
+{
+	ElemType* ris = NULL;
+	size_t dim = 0;
+	if (v != NULL && n != 0 && ris_dim != NULL)
+	{
+		for (size_t i = 0; i < n; i++) { dim += v[i].times; }
+		ris = malloc(dim * sizeof(ElemType));
+		size_t index = 0;
+		for (size_t i = 0; i < n; i++) { for (size_t j = 0; j < v[i].times; j++) { ris[index++] = v[i].e; } }
+	}
+	*ris_dim = dim;
+	return ris;
+}
+
+void stampa(const Elem_List* el, size_t n)
+{
+	size_t dim = 0;
+	ElemType* v = ElemVectorFromStructVector(el, n, &dim);
+	printf("Dato il vettore di ElemType v[%zu] = { ", dim);
+	for (size_t i = 0; i < dim; i++)
+	{
+		(v[i] != NV) ? ElemWriteStdout(v + i) : printf("NULL");
+		if (i != dim - 1) { printf(", "); }
+	}
+	printf(" }\n\n");
+	Node* ris = TreeFromLevelVector(v, dim);
+	free(v);
+	TreePrintLevel(ris);
+	printf("\n\n");
+	printf("Libero la memoria allocata... ");
+	TreeDelete(ris);
+	if (_CrtDumpMemoryLeaks() == 0) { printf("fatto\n\n\n"); }
+	else { printf("MEMORY LEAK! - Controlla le malloc/calloc/realloc che siano correttamente liberate!\n\n\n"); }
 }
