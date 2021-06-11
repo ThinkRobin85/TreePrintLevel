@@ -1,0 +1,8 @@
+# ignorare tutto
+*
+# eccezioni (!) nome del file / estensione
+!*.c
+!*.h
+!README.md
+!.gitignore
+!*/  
