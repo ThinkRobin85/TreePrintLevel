@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <crtdbg.h>
+#include <stdint.h>
 static void TreeGetHeightRec(Node* n, size_t curr_lvl, size_t* level)
 {
 	if (n == NULL) { return; }
@@ -66,7 +67,7 @@ static void TreeGetLevelValuesRec(const Node* n, const ElemType** ris, size_t le
 const ElemType** TreeGetLevelValues(const Node* n, size_t level)
 {
 	if (n == NULL) { return NULL; }
-	const ElemType** ris = calloc((size_t)1 << level, sizeof(ElemType*));
+	const ElemType** ris = calloc((uint64_t)1 << level, sizeof(ElemType*));
 	size_t index = 0;
 	TreeGetLevelValuesRec(n, ris, level, 0, &index);
 	return ris;
